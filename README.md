@@ -67,6 +67,7 @@ Training and validation accuracy closely track each other, converging above 80%.
 - `Lab08.ipynb`: Jupyter notebook containing code, experiments, and results.  
 - `training_history.jpg`: Visualization of model metrics and performance.  
 - `FINAL_REPORT_1.txt`: Detailed markdown report, including architecture, configuration, and insights.
+- `requirements.txt`: Outlining the version requirements and installations.
 
 ## Insights
 

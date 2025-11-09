@@ -1,0 +1,82 @@
+
+================================================================================
+PART 3 FINAL CHALLENGE - Phase I 
+================================================================================
+
+Step 3.1 to 3.4
+
+================================================================================
+SECTION 1: PROBLEM STATEMENT & APPROACH
+================================================================================
+
+1.1 Problem Statement
+─────────────────────
+Build a Convolutional Neural Network (CNN) to classify food images using the Food-101 dataset, which contains 101 food categories and ~101,000 images (or a focused subset).  
+Objective: Achieve strong test accuracy on a small subset (3 classes: pizza, steak, sushi) as a scalable baseline for larger subsets.  
+Performance Goal: Target minimum 80% classification accuracy on test data.  
+Constraints: Must use <15 GB storage, fit in memory of a single machine, and complete training within 2 hours on CPU or considerably faster on GPU.
+
+
+
+
+1.2 Approach
+────────────────────
+We started with a custom CNN composed of 4 convolutional blocks with progressive filter expansion (32→64→128→256), batch normalization, max pooling, and dropout.  
+Training used the Adam optimizer, standard data augmentation (flips, rotation, color jitter, affine transforms), and early stopping based on validation performance.  
+All images were resized and normalized for input. Performance was tracked by accuracy and F1 on a held-out test set.
+
+
+================================================================================
+SECTION 2: IMPLEMENTATION DETAILS
+================================================================================
+
+2.1 Model Architecture
+──────────────────────
+
+a) Architecture Choice: Custom CNN
+
+   • Number of layers: 4 convolutional blocks + 2 fully connected layers (excluding output)
+   • Filter progression: 32 → 64 → 128 → 256 (Conv blocks), then fully connected (512, 256)
+   • Total parameters: ~1,464,581
+   • Key components: BatchNorm after each conv, max pooling, dropout (0.15–0.5), global average pooling before FC layers
+
+
+
+2.2 Data Pipeline
+─────────────────
+
+a) Data Augmentation:
+   • Techniques used: Random horizontal flip (p=0.5), vertical flip (p=0.2), random rotation (15°), color jitter, random affine translation (0.1)
+   • Why: Improves generalization and reduces overfitting, especially effective when data is limited or class-imbalanced
+   • Effect on training: Noticed improved validation accuracy and slower overfitting compared to no augmentation
+
+
+b) Data Preprocessing:
+   • Image size: Resized all images to 224×224
+   • Normalization: Mean/std of ImageNet ([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+   • Train/test split: Used official Food-101 splits, focused on a 3-class subset (~2,000 images train, ~700 test)
+   • Batch size: 32 (chosen for efficiency and resource balance)
+
+
+
+2.3 Training Configuration
+──────────────────────────
+
+a) Hyperparameters:
+   • Initial learning rate: 0.001  
+   • Optimizer: Adam with weight decay of 1e-4  
+   • Loss function: CrossEntropyLoss  
+   • Epochs: Up to 15, with early stopping (patience 5, stop if no val improvement)
+
+b) Regularization:
+   • Dropout: ~0.15 in conv blocks, 0.5 in fully connected layers  
+   • Weight decay: L2 regularization at 1e-4  
+   • Early stopping: patience 5 without improvement  
+   • Gradient clipping: max norm 1.0
+
+c) Learning Rate Scheduling:
+   • ReduceLROnPlateau scheduler: reduce LR by factor 0.5 if validation loss plateaus 3x
+   • Minimum LR capped at 1e-6
+
+================================================================================
+
